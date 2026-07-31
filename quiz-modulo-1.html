@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz · Módulo 1</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root{
+  --bg:#FBF4F6;
+  --surface:#FFFFFF;
+  --surface-soft:#FDF1F5;
+  --pink-100:#FBE4EC;
+  --pink-300:#F3B8CE;
+  --rose-700:#B85A80;
+  --rose-900:#7A3A56;
+  --ink:#3A2A32;
+  --muted:#8B7480;
+  --border:#F0D9E3;
+  --green-bg:#E9F5EC;
+  --green-text:#2E6B44;
+  --green-border:#B9DFC4;
+  --red-bg:#FCEAEA;
+  --red-text:#9A3B3B;
+  --red-border:#F0BEBE;
+  --shadow:0 8px 24px rgba(184,90,128,0.08);
+  --radius:14px;
+  --font-display:'Fraunces', Georgia, serif;
+  --font-body:'Inter', -apple-system, sans-serif;
+  --font-mono:'IBM Plex Mono', monospace;
+}
+*{box-sizing:border-box;}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important; animation:none!important;} }
+body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--font-body); line-height:1.55;}
+:focus-visible{outline:2px solid var(--rose-700); outline-offset:2px;}
+.topbar{height:6px; background:linear-gradient(90deg, var(--pink-300), var(--rose-700));}
+
+header.masthead{max-width:760px; margin:0 auto; padding:2.25rem 1.5rem 1rem;}
+.kicker{font-family:var(--font-mono); font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--rose-700); margin:0 0 0.5rem;}
+h1{font-family:var(--font-display); font-weight:500; font-size:clamp(26px,4vw,34px); margin:0 0 0.4rem; color:var(--rose-900);}
+.sub{color:var(--muted); font-size:14.5px; max-width:60ch; margin:0;}
+
+.wrap{max-width:760px; margin:0 auto; padding:0 1.5rem 4rem;}
+
+.progress-track{height:6px; background:var(--pink-100); border-radius:999px; overflow:hidden; margin:1.5rem 0 0.4rem;}
+.progress-fill{height:100%; background:var(--rose-700); width:0%; transition:width .3s ease;}
+.progress-label{font-size:12px; color:var(--muted); display:flex; justify-content:space-between; margin-bottom:1.25rem;}
+
+.card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:1.75rem 2rem; box-shadow:var(--shadow);}
+.q-section{font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--rose-700); margin:0 0 0.5rem;}
+.q-text{font-family:var(--font-display); font-weight:500; font-size:20px; color:var(--ink); margin:0 0 1.4rem;}
+
+.options{display:flex; flex-direction:column; gap:0.6rem;}
+.option{
+  display:flex; align-items:flex-start; gap:0.7rem;
+  text-align:left; width:100%;
+  border:1px solid var(--border); background:var(--surface-soft);
+  border-radius:12px; padding:0.75rem 1rem; font-size:14.5px;
+  cursor:pointer; font-family:var(--font-body); color:var(--ink);
+}
+.option:hover{border-color:var(--pink-300);}
+.option .letter{
+  flex-shrink:0; width:24px; height:24px; border-radius:50%;
+  background:var(--pink-100); color:var(--rose-700);
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:600;
+}
+.option.correct{background:var(--green-bg); border-color:var(--green-border); color:var(--green-text);}
+.option.correct .letter{background:var(--green-border); color:var(--green-text);}
+.option.incorrect{background:var(--red-bg); border-color:var(--red-border); color:var(--red-text);}
+.option.incorrect .letter{background:var(--red-border); color:var(--red-text);}
+.option[disabled]{cursor:default;}
+.option:not(.correct):not(.incorrect)[disabled]{opacity:0.55;}
+
+.feedback{
+  margin-top:1.1rem; padding:0.8rem 1rem; border-radius:10px;
+  font-size:13.8px; display:none;
+}
+.feedback.show{display:block;}
+.feedback.ok{background:var(--green-bg); color:var(--green-text); border:1px solid var(--green-border);}
+.feedback.ko{background:var(--red-bg); color:var(--red-text); border:1px solid var(--red-border);}
+
+.nav-row{display:flex; justify-content:flex-end; margin-top:1.5rem;}
+button.next-btn{
+  border:none; background:var(--rose-700); color:#fff; font-weight:600;
+  font-family:var(--font-body); font-size:14px; padding:0.65rem 1.4rem;
+  border-radius:999px; cursor:pointer; opacity:0.4; pointer-events:none;
+}
+button.next-btn.active{opacity:1; pointer-events:auto;}
+button.next-btn:hover.active{background:var(--rose-900);}
+
+.results-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:2rem; box-shadow:var(--shadow); text-align:center;}
+.score-big{font-family:var(--font-display); font-size:48px; color:var(--rose-900); margin:0.4rem 0;}
+.score-msg{font-size:14.5px; color:var(--muted); max-width:48ch; margin:0 auto 1.5rem;}
+.breakdown{text-align:left; margin-top:1.5rem;}
+.break-row{display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem; font-size:13px;}
+.break-label{width:230px; flex-shrink:0; color:var(--ink);}
+.break-track{flex:1; height:8px; background:var(--pink-100); border-radius:999px; overflow:hidden;}
+.break-fill{height:100%; background:var(--rose-700);}
+.break-score{width:44px; text-align:right; font-family:var(--font-mono); font-size:12px; color:var(--muted);}
+.retry-btn{
+  margin-top:1.75rem; border:1px solid var(--border); background:var(--surface-soft);
+  color:var(--rose-900); font-weight:600; font-family:var(--font-body); font-size:13.5px;
+  padding:0.6rem 1.3rem; border-radius:999px; cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+<header class="masthead">
+  <p class="kicker">Curso de fonética y fonología clínica · @vivetulenguaje</p>
+  <h1>Quiz · Módulo 1: primeros pasos</h1>
+  <p class="sub">Comprueba lo que has asimilado sobre la construcción del perfil fonético-fonológico antes de pasar al módulo 2.</p>
+</header>
+
+<div class="wrap">
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="progress-label"><span id="progress-text">Pregunta 1 de 21</span><span id="score-text">Aciertos: 0</span></div>
+
+  <div id="quiz-area"></div>
+  <div id="results-area" style="display:none;"></div>
+</div>
+
+<script>
+const questions = [
+  {section:'Naturaleza del déficit', q:'¿Cuál es la pregunta clínica más importante antes de intervenir, según el módulo?', options:['Qué sonidos falla el niño','Por qué falla esos sonidos','Cuántos sonidos falla','A qué edad debería producir el sonido'], correct:1, explain:'Lo primero no es preguntar qué sonidos falla, sino por qué los falla: eso determina el mecanismo alterado y orienta toda la intervención.'},
+  {section:'Naturaleza del déficit', q:'Un perfil que puede requerir una evaluación específica adicional por una posible base motora se clasifica como:', options:['Fonético','Fonológico','Mixto','Compatible con un trastorno motor del habla'], correct:3, explain:'Este perfil requiere descartar o confirmar un trastorno motor del habla mediante evaluación específica.'},
+
+  {section:'Inventario fonético/fonológico', q:'Un niño produce /k/ correctamente al repetir, pero dice espontáneamente "tasa" en vez de "casa". Esto indica que:', options:['El sonido está en su inventario fonético pero no en el fonológico','El sonido está en su inventario fonológico pero no en el fonético','No tiene el sonido en ningún inventario','Presenta un trastorno motor del habla'], correct:0, explain:'Puede producir el sonido (fonético) pero no lo usa para contrastar significados en su habla real (fonológico). Esta diferencia cambia el tratamiento.'},
+  {section:'Inventario fonético/fonológico', q:'El inventario fonológico se refiere a:', options:['Los sonidos que puede producir en cualquier contexto','Los contrastes que usa realmente para diferenciar significados','Los sonidos estimulables','Los procesos fonológicos presentes'], correct:1, explain:'El inventario fonológico son los contrastes que el niño usa funcionalmente para diferenciar significados, no solo lo que es capaz de articular.'},
+
+  {section:'Organización del sistema', q:'¿Cuál de las siguientes NO es una pregunta clave para entender la organización del sistema fonológico?', options:['¿Los errores siguen un patrón o son aislados?','¿Qué clase de sonidos están afectados?','¿Cómo es la estructura silábica?','¿Cuántos años tiene el niño?'], correct:3, explain:'La organización del sistema se analiza a través del patrón de errores, las clases de sonidos afectadas y la estructura silábica, no directamente por la edad.'},
+
+  {section:'Procesos fonológicos', q:'"Plato" → "pato" es un ejemplo de:', options:['Reducción de grupos consonánticos','Fronting','Backing','Epéntesis'], correct:0, explain:'Se elimina un elemento del grupo consonántico /pl/, un proceso de estructura silábica.'},
+  {section:'Procesos fonológicos', q:'"Casa" → "tasa" es un ejemplo de:', options:['Backing','Fronting','Stopping','Gliding'], correct:1, explain:'Un sonido posterior /k/ se sustituye por uno anterior /t/: fronting.'},
+  {section:'Procesos fonológicos', q:'"Sopa" → "topa" es un ejemplo de:', options:['Stopping','Desafricación','Desnasalización','Asimilación progresiva'], correct:0, explain:'Una fricativa /s/ se sustituye por una oclusiva /t/: stopping.'},
+  {section:'Procesos fonológicos', q:'Para decidir la prioridad terapéutica de un proceso fonológico, el módulo indica valorar todas estas EXCEPTO:', options:['Si es evolutivo o atípico','Su frecuencia de aparición','Su impacto funcional sobre la inteligibilidad','La ubicación geográfica de la consulta'], correct:3, explain:'Los tres criterios clínicos son: tipo (evolutivo/atípico), frecuencia y impacto funcional. La ubicación de la consulta no influye en la priorización clínica.'},
+  {section:'Procesos fonológicos', q:'Un proceso que persiste más allá de la edad esperada para su desaparición se considera:', options:['Evolutivo','Atípico','Fonético','Funcional'], correct:1, explain:'Los procesos atípicos suelen indicar una mayor desorganización fonológica y requieren especial atención.'},
+
+  {section:'Consistencia', q:'Un niño dice siempre "sol" como [so]. Esto significa que:', options:['Es inconsistente','Es consistente, aunque la producción sea incorrecta','Tiene buena precisión articulatoria','No se puede valorar la consistencia'], correct:1, explain:'No hay que confundir consistencia con precisión: producir siempre el mismo error es una producción consistente.'},
+  {section:'Consistencia', q:'La inconsistencia en las producciones del niño puede reflejar:', options:['Reglas fonológicas muy estables','Mayor dificultad para planificar o acceder a las representaciones fonológicas','Un trastorno fonético leve sin más implicaciones','Buen pronóstico terapéutico'], correct:1, explain:'La inconsistencia obliga a ampliar el razonamiento clínico, ya que puede señalar dificultades de planificación o acceso a las representaciones.'},
+
+  {section:'Estimulabilidad', q:'Según el módulo, ¿cuál es el nivel de ayuda menos invasivo para valorar la estimulabilidad?', options:['Ayudas táctiles','Modelo auditivo','Facilitación fonética','Instrucciones verbales'], correct:1, explain:'El modelo auditivo es la ayuda menos invasiva y suele ser la primera estrategia empleada para valorar la estimulabilidad.'},
+  {section:'Estimulabilidad', q:'Las instrucciones verbales, como tipo de ayuda para valorar estimulabilidad, se centran en:', options:['Ofrecer un modelo auditivo para imitar','Dar indicaciones explícitas sobre la colocación o el movimiento articulatorio','Usar un espejo o gestos manuales','Aprovechar sonidos ya adquiridos por el niño'], correct:1, explain:'Las instrucciones verbales aumentan la conciencia articulatoria explicando cómo mover lengua, labios, mandíbula o el flujo de aire.'},
+  {section:'Estimulabilidad', q:'¿Debe usarse la estimulabilidad como único criterio para seleccionar objetivos terapéuticos?', options:['Sí, siempre','No, debe combinarse con otros indicadores','Solo en niños menores de 4 años','Solo si el proceso es atípico'], correct:1, explain:'La evidencia actual es clara: la estimulabilidad aporta información valiosa pero no debe ser el único criterio de selección de objetivos.'},
+
+  {section:'Severidad (PCC)', q:'Si una muestra contiene 120 consonantes esperadas y el niño produce 90 correctamente, ¿cuál es el PCC?', options:['90%','75%','120%','60%'], correct:1, explain:'PCC = (90/120) × 100 = 75%.'},
+  {section:'Severidad (PCC)', q:'¿Cuál es la diferencia principal entre el PCC clásico y el PCC-R?', options:['El PCC-R no penaliza las distorsiones','El PCC-R solo se aplica en adultos','El PCC clásico no cuenta las omisiones','No existe ninguna diferencia'], correct:0, explain:'El PCC-R (revisado) no penaliza las distorsiones, ya que suelen reflejar dificultades fonéticas más que fonológicas.'},
+  {section:'Severidad (PCC)', q:'¿En qué tipo de perfiles se recomienda usar el PCC-R en lugar del PCC clásico?', options:['Perfiles predominantemente fonéticos','Perfiles predominantemente fonológicos','Trastornos motores del habla','En todos los casos por igual'], correct:1, explain:'En perfiles predominantemente fonológicos suele recomendarse el PCC-R; el PCC clásico resulta más informativo para una medida global del habla.'},
+  {section:'Severidad (PCC)', q:'Según el módulo, dos niños con el mismo PCC pueden, sin embargo:', options:['Tener siempre el mismo pronóstico','Presentar perfiles muy distintos en cuanto a impacto funcional e inteligibilidad','No poder compararse nunca entre sí','Tener exactamente la misma inteligibilidad'], correct:1, explain:'El PCC no debe usarse como único indicador: dos perfiles con el mismo porcentaje pueden tener un impacto funcional muy diferente.'},
+
+  {section:'Inteligibilidad', q:'Según el módulo, el objetivo último de la intervención es:', options:['Producir fonemas perfectos','Mejorar la comunicación','Aumentar el PCC al 100%','Eliminar todos los procesos fonológicos'], correct:1, explain:'El objetivo último no es la perfección articulatoria, sino mejorar la comunicación funcional del niño.'},
+  {section:'Inteligibilidad', q:'¿En qué contextos recomienda el módulo valorar la inteligibilidad?', options:['Solo en conversación espontánea','Solo con personas familiares','En varios contextos: familiares, desconocidos, espontáneo y estructurado','Únicamente en la sala de terapia'], correct:2, explain:'La evidencia recomienda valorar la inteligibilidad en distintos contextos, ya que puede variar considerablemente entre ellos.'},
+
+  {section:'De la evaluación a la intervención', q:'Antes de iniciar el tratamiento hay que poder responder a cuatro preguntas clave. ¿Cuál de estas NO es una de ellas?', options:['¿Cuál es la naturaleza del déficit?','¿Qué aspecto limita más la comunicación del niño?','¿Qué objetivo tendrá mayor impacto funcional?','¿Cuánto cuesta la terapia?'], correct:3, explain:'Las cuatro preguntas clave son clínicas: naturaleza del déficit, aspecto más limitante, objetivo de mayor impacto y cómo medir el progreso.'},
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+const sectionStats = {};
+questions.forEach(q => { if(!sectionStats[q.section]) sectionStats[q.section] = {correct:0, total:0}; sectionStats[q.section].total++; });
+
+const quizArea = document.getElementById('quiz-area');
+const resultsArea = document.getElementById('results-area');
+const progressFill = document.getElementById('progress-fill');
+const progressText = document.getElementById('progress-text');
+const scoreText = document.getElementById('score-text');
+
+function renderQuestion(){
+  answered = false;
+  const q = questions[current];
+  progressFill.style.width = ((current) / questions.length * 100) + '%';
+  progressText.textContent = `Pregunta ${current + 1} de ${questions.length}`;
+  scoreText.textContent = `Aciertos: ${score}`;
+
+  const letters = ['A','B','C','D'];
+  quizArea.innerHTML = `
+    <div class="card">
+      <p class="q-section">${q.section}</p>
+      <p class="q-text">${q.q}</p>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="nav-row"><button class="next-btn" id="next-btn">${current === questions.length - 1 ? 'Ver resultados' : 'Siguiente'}</button></div>
+    </div>`;
+
+  const optionsEl = document.getElementById('options');
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt}</span>`;
+    btn.addEventListener('click', () => selectAnswer(i));
+    optionsEl.appendChild(btn);
+  });
+
+  document.getElementById('next-btn').addEventListener('click', () => {
+    if(!answered) return;
+    if(current === questions.length - 1){ showResults(); }
+    else { current++; renderQuestion(); }
+  });
+}
+
+function selectAnswer(i){
+  if(answered) return;
+  answered = true;
+  const q = questions[current];
+  const opts = document.querySelectorAll('.option');
+  opts.forEach((btn, idx) => {
+    btn.disabled = true;
+    if(idx === q.correct) btn.classList.add('correct');
+    else if(idx === i) btn.classList.add('incorrect');
+  });
+  const feedback = document.getElementById('feedback');
+  feedback.classList.add('show');
+  if(i === q.correct){
+    score++;
+    sectionStats[q.section].correct++;
+    feedback.className = 'feedback show ok';
+    feedback.textContent = `Correcto. ${q.explain}`;
+  } else {
+    feedback.className = 'feedback show ko';
+    feedback.textContent = `Respuesta correcta: ${q.options[q.correct]}. ${q.explain}`;
+  }
+  scoreText.textContent = `Aciertos: ${score}`;
+  document.getElementById('next-btn').classList.add('active');
+}
+
+function showResults(){
+  quizArea.style.display = 'none';
+  document.querySelector('.progress-track').style.display = 'none';
+  document.querySelector('.progress-label').style.display = 'none';
+  resultsArea.style.display = 'block';
+
+  const pct = Math.round((score / questions.length) * 100);
+  let msg = '';
+  if(pct >= 90) msg = 'Dominas con solidez los fundamentos del perfil fonético-fonológico. Estás listo para avanzar al módulo 2.';
+  else if(pct >= 70) msg = 'Buen manejo general de los conceptos clave. Repasa los apartados con más fallos antes de continuar.';
+  else if(pct >= 50) msg = 'Vas por buen camino, pero conviene reforzar varios conceptos antes de pasar al siguiente módulo.';
+  else msg = 'Te recomendamos repasar el módulo 1 completo antes de continuar; los fundamentos de esta base son claves para el resto del curso.';
+
+  const breakdownRows = Object.entries(sectionStats).map(([section, st]) => {
+    const p = Math.round((st.correct / st.total) * 100);
+    return `<div class="break-row">
+      <span class="break-label">${section}</span>
+      <div class="break-track"><div class="break-fill" style="width:${p}%;"></div></div>
+      <span class="break-score">${st.correct}/${st.total}</span>
+    </div>`;
+  }).join('');
+
+  resultsArea.innerHTML = `
+    <div class="results-card">
+      <p class="q-section">Resultado final</p>
+      <div class="score-big">${score} / ${questions.length}</div>
+      <p class="score-msg">${msg}</p>
+      <div class="breakdown">${breakdownRows}</div>
+      <button class="retry-btn" id="retry-btn">Repetir el quiz</button>
+    </div>`;
+
+  document.getElementById('retry-btn').addEventListener('click', () => {
+    current = 0; score = 0;
+    Object.values(sectionStats).forEach(st => st.correct = 0);
+    quizArea.style.display = 'block';
+    document.querySelector('.progress-track').style.display = 'block';
+    document.querySelector('.progress-label').style.display = 'flex';
+    resultsArea.style.display = 'none';
+    renderQuestion();
+  });
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
